@@ -1,6 +1,10 @@
 function move_enemys () {
     for (let value of list) {
         value.x += -2
+        if (value.overlapsWith(mySprite)) {
+            value.destroy()
+            info.changeLifeBy(-1)
+        }
     }
 }
 function addenemy () {
@@ -22,10 +26,19 @@ function addenemy () {
         . . . . . . b b b b 3 d d d b a 
         . . . . . . . . . . b b b a a . 
         `, SpriteKind.Enemy))
-    list[list.length].setPosition(152, randint(0, 160))
+    list[list.length - 1].setPosition(152, randint(0, 160))
 }
+info.onLifeZero(function () {
+    game.splash("Uh Oh! You Lost!", "")
+    game.reset()
+})
+let score = 0
 let list: Sprite[] = []
-let mySprite = sprites.create(img`
+let mySprite: Sprite = null
+info.startCountdown(90)
+let textSprite = textsprite.create("sc", 0, 2)
+textSprite.setOutline(1, 8)
+mySprite = sprites.create(img`
     . . . . . . . . . . . . . . . . 
     . . . . 6 6 6 6 6 6 6 6 . . . . 
     . . . 6 9 6 6 6 6 6 6 c 6 . . . 
@@ -52,6 +65,14 @@ true
 )
 list = []
 addenemy()
+info.setLife(3)
+textSprite.setPosition(11, 101)
 forever(function () {
     move_enemys()
+    textSprite.setText("Score: " + score)
+    score += 1
+})
+forever(function () {
+    pause(500)
+    addenemy()
 })
